@@ -1,6 +1,23 @@
 {
-	"name": "svelte-navbar",
 	"version": "0.0.1",
+	"name": "svelte-navbar",
+	"description": "A cool animated navbar component for Svelte that switches between a side and a bottom navbar in a very funky way",
+	"keywords": [
+		"funky",
+		"blobby",
+		"svelte",
+		"navbar",
+		"component",
+		"animated",
+		"responsive"
+	],
+	"homepage": "https://github.com/HannesGitH/svelte-navbar#readme",
+	"author": "hannes Hattenbach <hanneshattenbach.dev@gmail.com> (https://hannesgith.github.io)",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/HannesGitH/svelte-navbar/issues",
+		"email": "hanneshattenbach.dev+sveltenavbarbug@gmail.com"
+	},
 	"scripts": {
 		"dev": "vite dev",
 		"build": "svelte-kit sync && svelte-package",
