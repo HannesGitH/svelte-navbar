@@ -5,9 +5,9 @@
 	//this depends on the actual svg used for the bottom bar, it has a viewBoxHeight of 1024 and the actual content starts at 920
 	const svgContentStart = { whenBottom: 920, whenleft: 125 };
 
-	export const color = '#a7c347';
-	export const marginBetweenIconsInPercent = 2;
-	export const rowSizeInPx: number = 70;
+	export let color = '#a7c347';
+	export let marginBetweenIconsInPercent = 2;
+	export let rowSizeInPx: number = 70;
 	let paths = {
 		left: 'M-107.884 1120.17L-105.799-47.8354C-105.701-102.542-61.2735-146.811-6.56687-146.714L17.4523-146.671C72.159-146.573 116.428-102.145 116.331-47.4388L114.245 1120.57C114.148 1175.27 69.7198 1219.54 15.0132 1219.45L-9.00604 1219.4C-63.7127 1219.3-107.982 1174.88-107.884 1120.17Z',
 		bottomToLeft:

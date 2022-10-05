@@ -8,7 +8,7 @@
 	export let scrollTo: string | null = null;
 
 	export let isCurrentlyActive: boolean = false;
-	export const color: string = 'white';
+	export let color: string = 'white';
 
 	function onClick() {
 		dispatch('click', {
