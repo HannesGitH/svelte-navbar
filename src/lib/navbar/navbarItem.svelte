@@ -29,16 +29,14 @@
 			},
 			duration: 1000
 		}}
-		class=" mdc-button mdc-button__ripple mdc-button--unelevated navElem {isCurrentlyActive
-			? 'active'
-			: ''}"
+		class="  navElem {isCurrentlyActive ? 'active' : ''}
+			mdc-button__ripple mdc-button--unelevated"
 		on:click={onClick}><slot /></button
 	>
 {:else}
 	<button
-		class=" mdc-button mdc-button__ripple mdc-button--unelevated navElem {isCurrentlyActive
-			? 'active'
-			: ''}"
+		class="  navElem {isCurrentlyActive ? 'active' : ''}
+		mdc-button__ripple mdc-button--unelevated"
 		on:click={onClick}><slot /></button
 	>
 {/if}

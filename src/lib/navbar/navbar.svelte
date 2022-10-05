@@ -124,11 +124,11 @@
 		@include full;
 		overflow: visible;
 		// opacity: 0.5;
-		z-index: 4;
+		z-index: -1;
 	}
 	#elemts-row {
 		@include full;
-		z-index: 5;
+		z-index: 0;
 		width: 100%;
 		overflow-x: auto;
 		white-space: nowrap;
