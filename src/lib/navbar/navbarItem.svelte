@@ -1,7 +1,7 @@
 <script lang="ts">
 	// import Button, { Label } from '@smui/button';
 	import { createEventDispatcher } from 'svelte';
-	import { scrollTo as sscrollTo } from 'svelte-scrolling';
+	import { scrollTo as sscrollTo } from 'svelte-scrolling-plus';
 
 	const dispatch = createEventDispatcher();
 
@@ -22,7 +22,7 @@
 {#if scrollTo}
 	<!-- remove on:click? -->
 	<button
-		use:sscrollTo={{ref: scrollTo,onStateChange: ({active}) => {console.log(active);isCurrentlyActive = active;},duration: 1000}}
+		use:sscrollTo={{ref: scrollTo,onStateChange: ({active}) => {isCurrentlyActive = active;},duration: 1000}}
 		class=" mdc-button mdc-button__ripple mdc-button--unelevated navElem {isCurrentlyActive
 			? 'active'
 			: ''}"
