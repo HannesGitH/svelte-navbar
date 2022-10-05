@@ -1,5 +1,5 @@
 {
-	"version": "0.0.2",
+	"version": "0.0.4",
 	"name": "svelte-navbar",
 	"description": "A cool animated navbar component for Svelte that switches between a side and a bottom navbar in a very funky way",
 	"keywords": [
@@ -48,6 +48,7 @@
 	"dependencies": {
 		"@material/button": "^14.0.0",
 		"flubber2": "^0.4.9",
-		"sass": "^1.55.0"
+		"sass": "^1.55.0",
+		"svelte-scrolling-plus": "^1.2.2"
 	}
 }

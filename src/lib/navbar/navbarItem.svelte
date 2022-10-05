@@ -1,11 +1,14 @@
 <script lang="ts">
 	// import Button, { Label } from '@smui/button';
-    import { createEventDispatcher } from 'svelte';
+	import { createEventDispatcher } from 'svelte';
+	import { scrollTo as sscrollTo } from 'svelte-scrolling';
 
 	const dispatch = createEventDispatcher();
 
-	export const isCurrentlyActivce : boolean = false;
-	export const color : string = 'white';
+	export let scrollTo: string | null = null;
+
+	export let isCurrentlyActive: boolean = false;
+	export const color: string = 'white';
 
 	function onClick() {
 		dispatch('click', {
@@ -13,9 +16,26 @@
 		});
 	}
 </script>
-<div id="defs" style="--color: {color}"></div>
 
-<button class=" mdc-button mdc-button__ripple mdc-button--unelevated navElem {isCurrentlyActivce ? 'active' : ''}" on:click={onClick}><slot></slot></button>
+<div id="defs" style="--color: {color}" />
+
+{#if scrollTo}
+	<!-- remove on:click? -->
+	<button
+		use:sscrollTo={{ref: scrollTo,onStateChange: ({active}) => {console.log(active);isCurrentlyActive = active;},duration: 1000}}
+		class=" mdc-button mdc-button__ripple mdc-button--unelevated navElem {isCurrentlyActive
+			? 'active'
+			: ''}"
+		on:click={onClick}><slot /></button
+	>
+{:else}
+	<button
+		class=" mdc-button mdc-button__ripple mdc-button--unelevated navElem {isCurrentlyActive
+			? 'active'
+			: ''}"
+		on:click={onClick}><slot /></button
+	>
+{/if}
 
 <style lang="scss">
 	@use '@material/button/index' as mdc-button;
