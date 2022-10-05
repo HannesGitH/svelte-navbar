@@ -19,7 +19,7 @@
 	let interpolator = (p: number) => paths.bottom;
 	onMount(async () => {
 		const pathls = [paths.bottom, paths.bottomToLeft, paths.left];
-		interpolator = await interpolateSequence(pathls, { loop: false }) as (p:number)=>string;
+		interpolator = (await interpolateSequence(pathls, { loop: false })) as (p: number) => string;
 	});
 	const scaledToExponents = (x: number, l: number) => {
 		const val = x - l / 2;
@@ -132,9 +132,13 @@
 		width: 100%;
 		overflow-x: auto;
 		white-space: nowrap;
-	}
-	#elemts-row + * {
-		// position: absolute;
+		& + * {
+			// position: absolute;
+		}
+
+		& * {
+			transition: scale 0.5s ease;
+		} 
 	}
 	#main {
 		// @include smui;
