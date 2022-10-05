@@ -123,6 +123,7 @@
 <style lang="scss">
 	#wrapper {
 		@include full;
+		pointer-events: none;
 		overflow: visible;
 		// opacity: 0.5;
 		z-index: 0;
