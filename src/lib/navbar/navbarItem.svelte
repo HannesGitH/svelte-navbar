@@ -22,7 +22,13 @@
 {#if scrollTo}
 	<!-- remove on:click? -->
 	<button
-		use:sscrollTo={{ref: scrollTo,onStateChange: ({active}) => {isCurrentlyActive = active;},duration: 1000}}
+		use:sscrollTo={{
+			ref: scrollTo,
+			onStateChange: ({ active }) => {
+				isCurrentlyActive = active;
+			},
+			duration: 1000
+		}}
 		class=" mdc-button mdc-button__ripple mdc-button--unelevated navElem {isCurrentlyActive
 			? 'active'
 			: ''}"
@@ -49,18 +55,25 @@
 		@include mdc-button.outline-width(0, 1rem);
 		// @include mdc-button.height(1rem);
 		font-style: italic;
+		transition: color 400ms, opacity 400ms, scale 400ms;
 
 		z-index: 3;
 
-		.active {
-			scale: 1.2;
-		}
-
 		&:hover {
-			opacity: 0.9;
+			opacity: 0.8;
+			scale: 1.1;
 		}
 		&:active {
 			opacity: 0.5;
 		}
+
+		& * {
+			transition: color 400ms, opacity 400ms, scale 400ms;
+		}
+
+		// .active {
+		// 	scale: 1.2;
+		// 	color: red;
+		// }
 	}
 </style>
