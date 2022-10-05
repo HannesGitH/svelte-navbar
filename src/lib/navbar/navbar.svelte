@@ -97,6 +97,7 @@
 		version="1.1"
 		viewBox="0 0 {svgSize} {svgSize}"
 		preserveAspectRatio="none"
+		pointer-events="none"
 		width="100%"
 		xmlns="http://www.w3.org/2000/svg"
 		xmlns:xlink="http://www.w3.org/1999/xlink"
