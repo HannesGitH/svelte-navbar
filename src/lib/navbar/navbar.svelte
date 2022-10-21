@@ -20,6 +20,7 @@
 	onMount(async () => {
 		const pathls = [paths.bottom, paths.bottomToLeft, paths.left];
 		interpolator = (await interpolateSequence(pathls, { loop: false })) as (p: number) => string;
+		updateSlot();
 	});
 	const scaledToExponents = (x: number, l: number) => {
 		const val = x - l / 2;
@@ -33,12 +34,12 @@
 			: scrollProgress >= 1
 			? `width:${rowSizeInPx}px`
 			: 'overflow:hidden';
-	let slot: Element | null = null;
-	$: {
-		//TODO: damn this updates only on animationchange, kinda shitty
-		if (slot) {
-			const collection = slot.children;
-			const rect = slot.getBoundingClientRect();
+	let slotti: Element | null = null;
+
+	const updateSlot = ()=>{
+		if (slotti) {
+			const collection = slotti.children;
+			const rect = slotti.getBoundingClientRect();
 			const clength = collection.length;
 			const calcXY = (index: number, progress: number, x?: number, y?: number) => {
 				const scaledProgress = (progress ** scaledToExponents(index + 1.5, clength) * Math.PI) / 2;
@@ -69,10 +70,14 @@
 			}
 		}
 	}
+
+	$: {
+		slotti,scrollProgress ,updateSlot();
+	}
 	let window: any;
 </script>
 
-<div id="elemts-row" bind:this={slot} style={elemtsrowStyle}>
+<div id="elemts-row" bind:this={slotti} style={elemtsrowStyle}>
 	<slot>
 		<p>Lorem ipsum dolor sit amet.</p>
 	</slot>
@@ -118,7 +123,8 @@
 	</svg>
 </div>
 
-<svelte:window bind:scrollY={window} bind:innerWidth={window} />
+<!--? ich weiss nicht mehr wofür der genau nötig war, aber er hat was sinnvolles gemacht, aber gleichzeitig leider auch enormen CLS verursacht (was ewig herauszufinden gedauert hat) -->
+<!-- <svelte:window bind:scrollY={window} bind:innerWidth={window} /> -->
 
 <style lang="scss">
 	#wrapper {
