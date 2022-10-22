@@ -134,12 +134,23 @@
 		// opacity: 0.5;
 		z-index: 0;
 	}
+
+	#elements-row
+
+
 	#elemts-row {
 		@include full;
 		z-index: 1;
 		width: 100%;
-		overflow-x: auto;
+		overflow: auto;
+
 		white-space: nowrap;
+
+		-ms-overflow-style: none; /* IE and Edge */
+		scrollbar-width: none; /* Firefox */
+		&::-webkit-scrollbar {
+			display: none;
+		}
 		& + * {
 			// position: absolute;
 		}
