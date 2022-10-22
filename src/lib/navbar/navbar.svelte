@@ -135,9 +135,6 @@
 		z-index: 0;
 	}
 
-	#elements-row
-
-
 	#elemts-row {
 		@include full;
 		z-index: 1;
