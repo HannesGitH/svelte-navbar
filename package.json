@@ -1,5 +1,5 @@
 {
-	"version": "0.0.114",
+	"version": "0.0.115",
 	"name": "svelte-navbar",
 	"description": "A cool animated navbar component for Svelte that switches between a side and a bottom navbar in a very funky way",
 	"keywords": [
