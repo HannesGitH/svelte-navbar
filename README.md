@@ -25,4 +25,4 @@ this is still WIP
 
 ## Example
 
-an example can (soon) be found [here](https://hannesgith.github.io/) with implementation [here](https://github.com/HannesGitH/HannesGitH.github.io/blob/v2/src/routes/%2Bpage.svelte)
+an example can be found [here](https://hannesgith.github.io/) with implementation [here](https://github.com/HannesGitH/HannesGitH.github.io/blob/v2/src/routes/%2Bpage.svelte)
