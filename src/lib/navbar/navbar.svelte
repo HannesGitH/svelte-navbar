@@ -1,9 +1,16 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { interpolateSequence } from 'flubber2';
+
+	import InterpolationWorker from '$lib/workers/interpolator.worker?worker';
+
+	// import { interpolateSequence } from 'flubber2';
 	const svgSize = 1024;
 	//this depends on the actual svg used for the bottom bar, it has a viewBoxHeight of 1024 and the actual content starts at 920
 	const svgContentStart = { whenBottom: 920, whenleft: 125 };
+
+	import { tweened } from 'svelte/motion';
+	const opacity = tweened(0, { duration: 1000 });
+
 
 	export let color = '#a7c347';
 	export let marginBetweenIconsInPercent = 2;
@@ -16,12 +23,58 @@
 			'M-73.6978 920.009L1094.31 920.009C1149.02 920.009 1193.37 964.357 1193.37 1019.06L1193.37 1043.08C1193.37 1097.79 1149.02 1142.14 1094.31 1142.14L-73.6978 1142.14C-128.405 1142.14-172.753 1097.79-172.753 1043.08L-172.753 1019.06C-172.753 964.357-128.405 920.009-73.6978 920.009Z'
 	};
 	export let scrollProgress = 0;
+	let computedScrollProgress = 0;
+	$: scrollProgress_ = computedScrollProgress;
 	let interpolator = (p: number) => paths.bottom;
+
+
+	let interpolationWorker: Worker | undefined = undefined;
+
+	const onWorkerMessage = (e: {  data: {msg: string, t: number; id: number; path: string } }) => {
+		// console.log(e);
+		const d = e.data;
+		// console.log(d);
+		switch (d.msg) {
+			case 'loaded':
+				opacity.set(1);
+            	setTimeout(()=>updateSlot(1), 100);
+				break;
+			default:
+				currentPath =  d.path;
+				computedScrollProgress = d.t;
+				updateSlot(d.t);
+				if (d.t == 1) {
+					setTimeout(()=>updateSlot(1), 100); //FIXME: this is a hack to fix slot items not being displayed when scrolling from top into lower sections within one frame (as the div doesnt have the correct sizes or something yet)
+				}
+				break;
+		}
+		
+	};
+
+	let currentPath : string = paths.bottom;
+
+	const loadWorker = async () => {
+		interpolationWorker = new InterpolationWorker();
+		interpolationWorker.onmessage = onWorkerMessage;
+		interpolationWorker.onmessageerror = (e) => console.log(e);
+	};
+
 	onMount(async () => {
-		const pathls = [paths.bottom, paths.bottomToLeft, paths.left];
-		interpolator = (await interpolateSequence(pathls, { loop: false })) as (p: number) => string;
-		updateSlot();
+		loadWorker().then(async () => {
+			const pathList = [paths.bottom, paths.bottomToLeft, paths.left];
+			interpolationWorker!.postMessage({ task: 'load', paths: pathList });
+			interpolator = (t: number):string => {
+				interpolationWorker!.postMessage({ task: 'interpolate', t , id: 0});
+				return currentPath;
+			};
+		});
 	});
+
+	// onMount(async () => {
+	// 	const pathls = [paths.bottom, paths.bottomToLeft, paths.left];
+	// 	interpolator = (await interpolateSequence(pathls, { loop: false })) as (p: number) => string;
+	// 	updateSlot();
+	// });
 	const scaledToExponents = (x: number, l: number) => {
 		const val = x - l / 2;
 		if (val < 0) return 1 / (1 - val);
@@ -29,14 +82,16 @@
 		else return val + 1;
 	};
 	$: elemtsrowStyle =
-		scrollProgress <= 0
+		scrollProgress_ <= 0
 			? `height:${rowSizeInPx}px`
-			: scrollProgress >= 1
+			: scrollProgress_ >= 1
 			? `width:${rowSizeInPx}px`
 			: 'overflow:hidden';
 	let slotti: Element | null = null;
 
-	const updateSlot = ()=>{
+	const updateSlot = async (scrollP : number) =>{
+		//timeout promise
+		// await new Promise((resolve) => setTimeout(resolve, 100));
 		if (slotti) {
 			const collection = slotti.children;
 			const rect = slotti.getBoundingClientRect();
@@ -45,39 +100,60 @@
 				const scaledProgress = (progress ** scaledToExponents(index + 1.5, clength) * Math.PI) / 2;
 				const modifiedX = x ? x / rect.width : (index + 0.5) / (clength + 1);
 				const modifiedY = y ? y / rect.height : (clength - index) / (clength + 1);
+				const newX = (1 - Math.sin(scaledProgress)) * modifiedX * rect.width;
+				const newY = (1 - Math.cos(scaledProgress)) * modifiedY * rect.height;
+
+				// if (index == 0) {
+				// 	if (newY < 0) console.warn(newY, modifiedY, y, scaledProgress, progress);
+				// 	else console.log(newY, modifiedY, y, scaledProgress);
+				// }
+
 				return {
-					x: (1 - Math.sin(scaledProgress)) * modifiedX * rect.width,
-					y: (1 - Math.cos(scaledProgress)) * modifiedY * rect.height,
+					x: newX,
+					y: newY,
 					// + (svgSize - svgContentStart.whenBottom) / 2,
 					rad: scaledProgress
 				};
 			};
 			let widthAccu = 50;
-			let heightAccu = rect.height - 100;
+			let heightAccu = Math.max(rect.height - 100,rowSizeInPx);
 			for (let i = 0; i < collection.length; i++) {
 				const element = collection[i];
 				if (element instanceof HTMLElement) {
-					const elemRect = element.getBoundingClientRect();
-					const { x, y, rad } = calcXY(i, scrollProgress, widthAccu, heightAccu);
-					widthAccu += elemRect.width + (marginBetweenIconsInPercent * rect.width) / 100;
-					heightAccu -= elemRect.height + (marginBetweenIconsInPercent * rect.height) / 100;
+					const { x, y, rad } = calcXY(i, scrollP, widthAccu, heightAccu);
 					element.style.position = 'absolute';
 					element.style.transformOrigin = 'bottom left';
 					element.style.bottom = `${y + 10}px`;
 					element.style.left = `${x + 10}px`;
 					element.style.transform = `rotateZ(${rad}rad)`;
+					const elemRect = element.getBoundingClientRect();
+					widthAccu += elemRect.width + (marginBetweenIconsInPercent * rect.width) / 100;
+					heightAccu -= elemRect.height + (marginBetweenIconsInPercent * rect.height) / 100;
 				}
 			}
 		}
 	}
 
 	$: {
-		slotti,scrollProgress ,updateSlot();
+		interpolator(scrollProgress); //updates scrollProgress_
+		// // updateSlot(scrollProgress_); //already done in interpolator
 	}
+
+	$: widthPx = ((scrollProgress_ ** 7 * svgSize) / svgContentStart.whenleft) * rowSizeInPx
+	$: widthPercent = (1 - scrollProgress_ ** 7) * 100;
+	$: heightPx = (((1 - scrollProgress_ ** (1 / 7)) * svgSize) / (svgSize - svgContentStart.whenBottom)) * rowSizeInPx;
+	$: heightPercent = scrollProgress_ ** (1 / 7) * 100;
+
 	let window: any;
+
+	const onload = (el: Element) => {
+		// el.addEventListener('load', () => {
+		// 	updateSlot(scrollProgress_);
+		// });
+	};
 </script>
 
-<div id="elemts-row" bind:this={slotti} style={elemtsrowStyle}>
+<div id="elemts-row" bind:this={slotti} use:onload style={elemtsrowStyle}>
 	<slot>
 		<p>Lorem ipsum dolor sit amet.</p>
 	</slot>
@@ -86,13 +162,8 @@
 	id="wrapper"
 	style="
 	--color: {color};
-	--progress: {scrollProgress};
-	width: calc({((scrollProgress ** 7 * svgSize) / svgContentStart.whenleft) * rowSizeInPx}px + {(1 -
-		scrollProgress ** 7) *
-		100}%); 
-	height: calc({(((1 - scrollProgress ** (1 / 7)) * svgSize) /
-		(svgSize - svgContentStart.whenBottom)) *
-		rowSizeInPx}px + {scrollProgress ** (1 / 7) * 100}%);
+	width: calc({widthPx}px + {widthPercent}%); 
+	height: calc({heightPx}px + {heightPercent}%);
 	"
 >
 	<svg
@@ -111,10 +182,10 @@
 		<clipPath id="ArtboardFrame">
 			<rect height="100%" width="100%" x="0" y="0" />
 		</clipPath>
-		<g clip-path="url(#ArtboardFrame)" id="Layer-1">
+		<g clip-path="url(#ArtboardFrame)" id="Layer-1" opacity={$opacity}>
 			<path
 				id="main"
-				d={interpolator(scrollProgress)}
+				d={currentPath}
 				fill-rule="nonzero"
 				opacity="1"
 				stroke="none"
