@@ -1,3 +1,24 @@
-<h1>Welcome to your library project</h1>
-<p>Create your package using @sveltejs/package and preview/showcase your work with SvelteKit</p>
-<p>Visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to read the documentation</p>
+<script lang="ts">
+	import Navbar, { NavbarItem } from "$lib";
+	import { scrollTop } from "svelte-scrolling-plus";
+
+    var progress:number;
+
+
+    const fakedata = ['1', 'sec2', 'sec3', 'sec4'];
+
+</script>
+
+
+<Navbar
+	scrollProgress={progress/100}
+	rowSizeInPx={50}
+	color="#a7c347"
+>
+	<NavbarItem on:click={() => scrollTop()}>Home</NavbarItem>
+	{#each fakedata as d}
+        <NavbarItem>{d}</NavbarItem>
+    {/each}
+</Navbar>
+
+<input type="number" bind:value={progress}>

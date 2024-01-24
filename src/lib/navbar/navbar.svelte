@@ -22,6 +22,12 @@
 		bottom:
 			'M-73.6978 920.009L1094.31 920.009C1149.02 920.009 1193.37 964.357 1193.37 1019.06L1193.37 1043.08C1193.37 1097.79 1149.02 1142.14 1094.31 1142.14L-73.6978 1142.14C-128.405 1142.14-172.753 1097.79-172.753 1043.08L-172.753 1019.06C-172.753 964.357-128.405 920.009-73.6978 920.009Z'
 	};
+
+	// import normflub from 'flubber2/src/normalize';
+	// $: {
+	// 	console.log(normflub(paths.left));
+	// }
+
 	export let scrollProgress = 0;
 	let computedScrollProgress = 0;
 	$: scrollProgress_ = computedScrollProgress;
@@ -139,10 +145,12 @@
 		// // updateSlot(scrollProgress_); //already done in interpolator
 	}
 
-	$: widthPx = ((scrollProgress_ ** 7 * svgSize) / svgContentStart.whenleft) * rowSizeInPx
-	$: widthPercent = (1 - scrollProgress_ ** 7) * 100;
-	$: heightPx = (((1 - scrollProgress_ ** (1 / 7)) * svgSize) / (svgSize - svgContentStart.whenBottom)) * rowSizeInPx;
-	$: heightPercent = scrollProgress_ ** (1 / 7) * 100;
+	$: sp2_p2 = Math.max(0,scrollProgress_*2-1);
+	$: sp2_p1 = Math.min(1,scrollProgress_*2);
+	$: widthPx = ((sp2_p2 ** 7 * svgSize) / svgContentStart.whenleft) * rowSizeInPx
+	$: widthPercent = (1 - sp2_p2 ** 7) * 100;
+	$: heightPx = (((1 - sp2_p1 ** (1 / 7)) * svgSize) / (svgSize - svgContentStart.whenBottom)) * rowSizeInPx;
+	$: heightPercent = sp2_p1 ** (1 / 7) * 100;
 
 	let window: any;
 
@@ -211,6 +219,7 @@
 		z-index: 1;
 		width: 100%;
 		overflow: auto;
+		pointer-events: none;
 
 		white-space: nowrap;
 
@@ -223,8 +232,9 @@
 			// position: absolute;
 		}
 
-		& * {
+		& :global( > * ) {
 			transition: scale 0.5s ease;
+			pointer-events: all;
 		} 
 	}
 	#main {
