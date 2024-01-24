@@ -43,7 +43,7 @@
 		switch (d.msg) {
 			case 'loaded':
 				opacity.set(1);
-            	setTimeout(()=>updateSlot(1), 100);
+            	setTimeout(()=>updateSlot(scrollProgress_), 100);
 				break;
 			default:
 				currentPath =  d.path;
